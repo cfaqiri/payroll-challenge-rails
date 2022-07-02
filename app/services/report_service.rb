@@ -5,6 +5,11 @@ class ReportService
     Report.exists?(number: report_number)
   end
 
+  def save_report(filename)
+    report_number = get_report_number(filename)
+    Report.create!(number: report_number)
+  end
+
   def parse_csv(file)
     CSV.parse((file), headers: true) do |row|
       date = row['date'].to_datetime

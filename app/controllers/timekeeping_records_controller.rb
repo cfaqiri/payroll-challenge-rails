@@ -1,10 +1,12 @@
 class TimekeepingRecordsController < ApplicationController
   require 'csv'
   def index
-    render json: TimekeepingRecord.all
+    records = TimekeepingRecord.all
+    render json: TimekeepingRecordsRepresenter.new(records).as_json
   end
 
   def create
+    # Put transaction
     file = params["fileupload"].read
     filename = params["fileupload"].original_filename
     report_service = ReportService.new
@@ -14,13 +16,9 @@ class TimekeepingRecordsController < ApplicationController
       return
     end
 
+    report_service.save_report(filename)
     report_service.parse_csv(file)
-
-    # Move this to a service
-  
-    
     render status: :created
-    # Do some error checking here for the file name and duplication
   end
 
   private
