@@ -19,14 +19,6 @@ class ReportService
       TimekeepingRecord.create!(date: date, hours: hours, employee: employee)
     end
   end
-    # existing_report = Report.objects.filter(number=report_number, employer=user)
-    # # Instead of checking the length, a more efficient function is 
-    # # report.objects.find(params).exists
-    # if len(existing_report) == 0:
-    #     return False
-    # return True
-
-  # private
 
   def get_report_number(filename)
     report_number = filename[/\d+/].to_i

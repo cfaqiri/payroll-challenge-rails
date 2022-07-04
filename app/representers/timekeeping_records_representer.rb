@@ -1,4 +1,6 @@
 class TimekeepingRecordsRepresenter
+  include ActionView::Helpers::NumberHelper
+
   def initialize(timekeeping_records)
     @timekeeping_records = timekeeping_records.order(:employee_id)
   end
@@ -36,9 +38,13 @@ class TimekeepingRecordsRepresenter
   end
 
   def as_json
+    # Convert pay to currency format and employee id to string
     {
       "payrollReport": {
-        "employeeReports": calculate_employee_reports
+        "employeeReports": calculate_employee_reports.each do |report|
+          report[:employeeId] = report[:employeeId].to_s
+          report[:amountPaid] = number_to_currency(report[:amountPaid])
+        end
       }
     }
   end
