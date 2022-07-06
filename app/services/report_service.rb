@@ -1,5 +1,4 @@
 class ReportService
-
   def check_duplicate_report(filename)
     report_number = get_report_number(filename)
     Report.exists?(number: report_number)
