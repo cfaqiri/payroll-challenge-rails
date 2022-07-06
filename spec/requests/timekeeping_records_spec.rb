@@ -87,20 +87,19 @@ describe 'Payroll API', type: :request do
 
   describe "POST /books" do
     it 'uploads a file of timekeeping data' do
-      @file = fixture_file_upload('time-report-16.csv', 'csv')
+      @file = fixture_file_upload('time-report-164.csv', 'csv')
       
       post "/timekeeping_records", params:{fileupload: @file}
-
+      
       expect(response).to have_http_status(:created)
     end
 
     it 'returns forbidden status when uploading duplicate report' do
-      FactoryBot.create(:report, number: 16)
+      FactoryBot.create(:report, number: 164)
 
-      @file = fixture_file_upload('time-report-16.csv', 'csv')
+      @file = fixture_file_upload('time-report-164.csv', 'csv')
       
       post "/timekeeping_records", params:{fileupload: @file}
-
       expect(response).to have_http_status(:forbidden)
     end
   end

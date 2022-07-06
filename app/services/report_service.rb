@@ -1,15 +1,14 @@
 class ReportService
-  def check_duplicate_report(filename)
+  def self.check_duplicate_report(filename)
     report_number = get_report_number(filename)
     Report.exists?(number: report_number)
   end
 
-  def save_report(filename)
-    report_number = get_report_number(filename)
-    Report.create!(number: report_number)
+  def self.get_report_number(filename)
+    report_number = filename[/\d+/].to_i
   end
 
-  def parse_csv(file)
+  def self.parse_csv(file)
     CSV.parse((file), headers: true) do |row|
       date = row['date'].to_datetime
       hours = row['hours worked']
@@ -19,7 +18,8 @@ class ReportService
     end
   end
 
-  def get_report_number(filename)
-    report_number = filename[/\d+/].to_i
+  def self.save_report(filename)
+    report_number = get_report_number(filename)
+    Report.create!(number: report_number)
   end
 end
