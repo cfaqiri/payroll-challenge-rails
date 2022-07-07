@@ -19,15 +19,36 @@ describe ReportService do
   end
 
   describe ".parse_csv" do
-    it "stores timekeeping records from file in database" do
-      FactoryBot.create(:job_group, title: 'A', rate: 20)
-      FactoryBot.create(:job_group, title: 'B', rate: 30)
+    FactoryBot.create(:job_group, title: 'A', rate: 20)
+    FactoryBot.create(:job_group, title: 'B', rate: 30)
 
+    it "stores timekeeping records from file in database" do
       @file = fixture_file_upload('time-report-164.csv', 'csv')
       
       expect {described_class.parse_csv(@file)}.to change {
         TimekeepingRecord.count 
       }.from(0).to(4)
+    end
+
+    context "when multiple calls are attempted at the same time" do
+      context "when locked" do
+        let(:mutex) { RedisMutex.new("upload-timekeeping-data-some-id-here") }
+
+        before { mutex.lock! }
+        after { mutex.unlock! }
+
+        it 'should raise an exception' do
+          @file = fixture_file_upload('time-report-164.csv', 'csv')
+          expect { described_class.parse_csv(@file) }.to raise_error RedisMutex::LockError
+        end
+      end
+
+      context "when not locked" do
+        it 'should not raise an exception' do
+          @file = fixture_file_upload('time-report-164.csv', 'csv')
+          expect { described_class.parse_csv(@file) }.to_not raise_error
+        end
+      end
     end
   end
 
@@ -36,6 +57,25 @@ describe ReportService do
       expect {described_class.save_report('time-report-1.csv')}.to change {
         Report.exists?(number: 1)
       }.from(false).to(true)
+    end
+
+    context "when multiple calls are attempted at the same time" do
+      context "when locked" do
+        let(:mutex) { RedisMutex.new("save-report-some-id-here") }
+
+        before { mutex.lock! }
+        after { mutex.unlock! }
+
+        it 'should raise an exception' do
+          expect { described_class.save_report('time-report-1.csv') }.to raise_error RedisMutex::LockError
+        end
+      end
+
+      context "when not locked" do
+        it 'should not raise an exception' do
+          expect { described_class.save_report('time-report-1.csv') }.to_not raise_error
+        end
+      end
     end
   end
 end

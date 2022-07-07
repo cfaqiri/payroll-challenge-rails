@@ -17,6 +17,7 @@ class TimekeepingRecordsController < ApplicationController
 
     ReportService.save_report(filename)
     ReportService.parse_csv(file)
+    
     render status: :created
   end
 
