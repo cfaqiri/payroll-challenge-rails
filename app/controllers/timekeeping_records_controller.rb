@@ -6,7 +6,6 @@ class TimekeepingRecordsController < ApplicationController
   end
 
   def create
-    # Put transaction
     file = params["fileupload"].read
     filename = params["fileupload"].original_filename
 
@@ -17,7 +16,7 @@ class TimekeepingRecordsController < ApplicationController
 
     ReportService.save_report(filename)
     ReportService.parse_csv(file)
-    
+
     render status: :created
   end
 
